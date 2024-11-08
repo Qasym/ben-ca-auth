@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(val userRepository: UserRepository) {
     @PostMapping("/register")
     fun register(@RequestBody user: User): HttpStatus {
+        println("/auth/register => >$user<")
+        userRepository.save(user)
         return HttpStatus.CREATED
     }
 
