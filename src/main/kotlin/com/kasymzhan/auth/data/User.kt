@@ -1,27 +1,28 @@
 package com.kasymzhan.auth.data
 
+import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "users")
 data class User(
     @Id
-    val id: Long,
+    var id: ObjectId?,
     var name: String,
     var password: String,
-    var status: Int = UserStatus.NEW,
+    var status: String = Status.NEW,
     var gold: Int = 0,
     var diamond: Int = 0,
-    var roles: MutableList<String> = mutableListOf(UserRoles.USER)
+    var role: String
 )
 
-object UserStatus {
-    const val NEW = 0
-    const val NOT_NEW = 1
-    const val BANNED = 2
+object Status {
+    const val NEW = "NEW"
+    const val NOT_NEW = "NOT_NEW"
+    const val BANNED = "BANNED"
 }
 
-object UserRoles {
+object Roles {
     const val USER = "USER"
     const val ADMIN = "ADMIN"
 }

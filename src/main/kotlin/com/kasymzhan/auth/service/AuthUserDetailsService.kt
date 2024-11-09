@@ -14,7 +14,7 @@ class AuthUserDetailsService(val userRepository: UserRepository) : UserDetailsSe
             ?: throw Exception("User >$username< is not found")
         val userDetails = User.withUsername(username)
             .password(user.password)
-            .roles(user.roles.first())
+            .roles(user.role)
             .build()
         return userDetails
     }

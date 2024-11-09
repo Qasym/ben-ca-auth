@@ -1,6 +1,6 @@
 package com.kasymzhan.auth.config
 
-import com.kasymzhan.auth.data.UserRoles
+import com.kasymzhan.auth.data.Roles
 import com.kasymzhan.auth.service.AuthUserDetailsService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,7 +21,7 @@ class SecurityConfig(val userDetailsService: AuthUserDetailsService) {
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers("/auth/*").permitAll()
-                    .requestMatchers("/action/*").hasAnyRole(UserRoles.USER, UserRoles.ADMIN)
+                    .requestMatchers("/action/*").hasAnyRole(Roles.USER, Roles.ADMIN)
             }
             .formLogin {
                 it.usernameParameter("name")
