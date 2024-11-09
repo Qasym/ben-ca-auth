@@ -21,7 +21,7 @@ class SecurityConfig(val userDetailsService: AuthUserDetailsService) {
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers("/auth/*").permitAll()
-                    .requestMatchers("/action/*").hasAnyRole(UserRoles.REGULAR, UserRoles.ADMIN)
+                    .requestMatchers("/action/*").hasAnyRole(UserRoles.USER, UserRoles.ADMIN)
             }
             .formLogin {
                 it.usernameParameter("name")

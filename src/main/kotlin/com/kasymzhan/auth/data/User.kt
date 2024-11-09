@@ -12,7 +12,7 @@ data class User(
     var status: Int = UserStatus.NEW,
     var gold: Int = 0,
     var diamond: Int = 0,
-    var roles: MutableList<String> = mutableListOf(UserRoles.REGULAR)
+    var roles: MutableList<String> = mutableListOf(UserRoles.USER)
 )
 
 object UserStatus {
@@ -22,6 +22,6 @@ object UserStatus {
 }
 
 object UserRoles {
-    const val REGULAR = "regular_user"
-    const val ADMIN = "admin_user"
+    const val USER = "USER"
+    const val ADMIN = "ADMIN"
 }
