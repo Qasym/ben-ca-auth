@@ -5,7 +5,6 @@ import com.kasymzhan.auth.data.AccessToken
 import com.kasymzhan.auth.data.Roles
 import com.kasymzhan.auth.data.User
 import com.kasymzhan.auth.data.UserRequest
-import com.kasymzhan.auth.repository.UserRepository
 import com.kasymzhan.auth.service.AuthUserDetailsService
 import com.kasymzhan.auth.service.TokenService
 import org.bson.types.ObjectId
@@ -50,7 +49,8 @@ class AuthController(
         val authToken = UsernamePasswordAuthenticationToken(user.name, user.password)
         authenticationManager.authenticate(authToken)
         val userDetails = userDetailsService.loadUserByUsername(user.name)
-        val jwtToken = tokenService.generate(userDetails)
+        val roles = mapOf("roles" to userDetails.authorities)
+        val jwtToken = tokenService.generate(userDetails, roles)
         return AccessToken(jwtToken)
     }
 }
