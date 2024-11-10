@@ -14,6 +14,8 @@ class TokenService(jwtConfig: JwtConfig) {
         jwtConfig.secret.toByteArray()
     )
 
+    private val expirationDate = Date(Date().time + jwtConfig.expiration)
+
     fun generate(
         userDetails: UserDetails, expirationDate: Date, additionalClaims: Map<String, Any> = emptyMap()
     ): String = Jwts.builder()
@@ -24,7 +26,10 @@ class TokenService(jwtConfig: JwtConfig) {
         .add(additionalClaims)
         .and().signWith(secretKey).compact()
 
-    fun getSubject(token: String): String? = getAllClaims(token).subject
+    fun generate(userDetails: UserDetails, additionalClaims: Map<String, Any> = emptyMap()) =
+        generate(userDetails, expirationDate, additionalClaims)
+
+    fun getUsername(token: String): String? = getAllClaims(token).subject
 
     fun isExpired(token: String): Boolean = getAllClaims(token).expiration.before(currentTime())
 
