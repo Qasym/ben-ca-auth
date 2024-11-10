@@ -21,8 +21,8 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = tokenService.tryParseToken(request).toString()
-        if (tokenService.isExpired(token)) {
+        val token = tokenService.tryParseToken(request)
+        if (token == null || tokenService.isExpired(token)) {
             filterChain.doFilter(request, response)
             return
         }
