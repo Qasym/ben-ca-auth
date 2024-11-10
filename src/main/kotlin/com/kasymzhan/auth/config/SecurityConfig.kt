@@ -1,17 +1,20 @@
 package com.kasymzhan.auth.config
 
 import com.kasymzhan.auth.data.Roles
-import com.kasymzhan.auth.service.AuthUserDetailsService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig(val userDetailsService: AuthUserDetailsService) {
+class SecurityConfig(val jwtAuthenticationFilter: JwtAuthenticationFilter) {
     @Bean
     fun passwordEncoder() = BCryptPasswordEncoder()
 
@@ -19,17 +22,23 @@ class SecurityConfig(val userDetailsService: AuthUserDetailsService) {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }
             .authorizeHttpRequests {
-                it.requestMatchers("/auth/*").permitAll()
-                    .requestMatchers("/action/*").hasAnyRole(Roles.USER, Roles.ADMIN)
+                it.requestMatchers("/auth/register", "/auth/login").permitAll()
+                    .requestMatchers("/action/**").hasAnyRole(Roles.USER, Roles.ADMIN)
             }
             .formLogin {
-                it.usernameParameter("name")
-                    .permitAll()
+                it.successForwardUrl("/auth/login")
+                    .usernameParameter("name").permitAll().disable()
             }
-            .logout {
-                it.permitAll()
-            }
+            .logout { it.permitAll() }
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }
+
+    @Bean
+    fun authenticationManager(authConfig: AuthenticationConfiguration): AuthenticationManager =
+        authConfig.authenticationManager
 }
