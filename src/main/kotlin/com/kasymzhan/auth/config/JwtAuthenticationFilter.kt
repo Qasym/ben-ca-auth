@@ -21,12 +21,7 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val authHeader: String? = request.getHeader("Authorization")
-        if (!authHeader.containsToken()) {
-            filterChain.doFilter(request, response)
-            return
-        }
-        val token = authHeader!!.extractToken()
+        val token = tokenService.tryParseToken(request).toString()
         if (tokenService.isExpired(token)) {
             filterChain.doFilter(request, response)
             return
@@ -45,10 +40,4 @@ class JwtAuthenticationFilter(
         if (SecurityContextHolder.getContext().authentication == null)
             SecurityContextHolder.getContext().authentication = authentication
     }
-
-    private fun String?.containsToken() =
-        this != null && this.startsWith("Bearer ")
-
-    private fun String.extractToken(): String =
-        this.substringAfter("Bearer ")
 }

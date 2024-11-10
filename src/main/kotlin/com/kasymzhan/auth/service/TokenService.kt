@@ -4,6 +4,7 @@ import com.kasymzhan.auth.config.JwtConfig
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.util.*
@@ -33,10 +34,24 @@ class TokenService(jwtConfig: JwtConfig) {
 
     fun isExpired(token: String): Boolean = getAllClaims(token).expiration.before(currentTime())
 
+    fun tryParseToken(request: HttpServletRequest): String? {
+        val authHeader: String? = request.getHeader("Authorization")
+        if (!authHeader.containsToken())
+            return null
+        val token = authHeader!!.extractToken()
+        return token
+    }
+
     private fun getAllClaims(token: String): Claims {
         val decoder = Jwts.parser().verifyWith(secretKey).build()
         return decoder.parseSignedClaims(token).payload
     }
 
     private fun currentTime() = Date()
+
+    private fun String?.containsToken() =
+        this != null && this.startsWith("Bearer ")
+
+    private fun String.extractToken(): String =
+        this.substringAfter("Bearer ")
 }
