@@ -30,9 +30,9 @@ class TokenService(jwtConfig: JwtConfig) {
     fun generate(userDetails: UserDetails, additionalClaims: Map<String, Any> = emptyMap()) =
         generate(userDetails, expirationDate, additionalClaims)
 
-    fun getUsername(token: String): String? = getAllClaims(token).subject
+    fun getUsername(token: String): String? = getAllClaims(token)?.subject
 
-    fun isExpired(token: String): Boolean = getAllClaims(token).expiration.before(currentTime())
+    fun isExpired(token: String): Boolean = getAllClaims(token)?.expiration?.before(currentTime()) ?: true
 
     fun tryParseToken(request: HttpServletRequest): String? {
         val authHeader: String? = request.getHeader("Authorization")
@@ -42,9 +42,14 @@ class TokenService(jwtConfig: JwtConfig) {
         return token
     }
 
-    private fun getAllClaims(token: String): Claims {
-        val decoder = Jwts.parser().verifyWith(secretKey).build()
-        return decoder.parseSignedClaims(token).payload
+    private fun getAllClaims(token: String): Claims? {
+        try {
+            val decoder = Jwts.parser().verifyWith(secretKey).build()
+            return decoder.parseSignedClaims(token).payload
+        } catch (e: Exception) {
+            println("exception: $e")
+            return null
+        }
     }
 
     private fun currentTime() = Date()
