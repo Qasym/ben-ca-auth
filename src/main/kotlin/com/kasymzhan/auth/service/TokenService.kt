@@ -10,12 +10,13 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class TokenService(jwtConfig: JwtConfig) {
+class TokenService(private val jwtConfig: JwtConfig) {
     private val secretKey = Keys.hmacShaKeyFor(
         jwtConfig.secret.toByteArray()
     )
 
-    private val expirationDate = Date(Date().time + jwtConfig.expiration)
+    private val expirationDate
+        get() = Date(Date().time + jwtConfig.expiration)
 
     fun generate(
         userDetails: UserDetails, expirationDate: Date, additionalClaims: Map<String, Any> = emptyMap()
